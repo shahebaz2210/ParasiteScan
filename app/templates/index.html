@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParasiteScan - Neural Diagnostic Platform</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Top Navigation Block -->
+    <nav class="top-nav glass-panel">
+        <div class="logo-area">
+            <div class="logo-icon-container">
+                <i class="fa-solid fa-plus logo-plus"></i>
+            </div>
+            <div class="logo-text-group">
+                <h1 class="logo-main">ParasiteScan <span class="badge-blue"></span></h1>
+                <span class="logo-sub">Neural Diagnostic Platform</span>
+            </div>
+        </div>
+        <div class="status-badge">
+            <div class="dot online"></div>
+            <span>System Online</span>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <!-- Dashboard Header Info -->
+        <header class="hero-section">
+            <h1 class="hero-title">Revolutionary <span class="highlight-purple">AI-Powered</span><br>Malaria Detection
+            </h1>
+            <p class="hero-subtitle">Clinical-grade accuracy • Real-time analysis • Instant results</p>
+
+            <div class="stats-row">
+                <div class="stat-card glass-panel">
+                    <i class="fa-solid fa-bullseye text-pink icon-large"></i>
+                    <div class="stat-info">
+                        <h2>{{ "{:.1%}".format(metrics.accuracy) if metrics.accuracy is defined else "N/A" }}</h2>
+                        <span>Accuracy</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <i class="fa-solid fa-bolt text-orange icon-large"></i>
+                    <div class="stat-info">
+                        <h2>&lt;3s</h2>
+                        <span>Analysis Time</span>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <i class="fa-solid fa-microscope text-blue icon-large"></i>
+                    <div class="stat-info">
+                        <h2 id="scans-today-display">{{ "{:,}".format(metrics.scans_today) if metrics.scans_today is
+                            defined else 0 }}</h2>
+                        <span>Scans Today</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- View 1: Upload (Home Page) -->
+        <section id="upload-view" class="view-section active">
+            <div class="upload-header">
+                <h2>Upload Blood Cell Image</h2>
+                <p>Drag & drop or click to browse • Supports PNG, JPG, JPEG</p>
+            </div>
+
+            <div class="upload-zone-container glass-panel">
+                <div class="upload-zone" id="drop-zone">
+                    <div class="scanner-line"></div>
+                    <form id="upload-form">
+                        <input type="file" id="file-input" name="file" accept="image/png, image/jpeg, image/jpg" hidden>
+                        <div class="upload-icon-circle">
+                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                        </div>
+                        <h3>Drop your microscopic image here</h3>
+                        <p>or click to select from your device</p>
+
+                        <div class="file-badges">
+                            <span class="file-badge">PNG</span>
+                            <span class="file-badge">JPG</span>
+                            <span class="file-badge">JPEG</span>
+                        </div>
+
+                        <div id="preview-container" class="preview-hidden">
+                            <img id="image-preview" src="#" alt="Preview">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" id="analyze-btn" disabled>
+                    Analyze Image
+                </button>
+            </div>
+        </section>
+
+        <!-- View 2: Results -->
+        <section id="result-view" class="view-section">
+            <div class="result-top-bar">
+                <h2>Diagnostic Report</h2>
+                <span class="timestamp" id="report-timestamp">Generated: --</span>
+            </div>
+
+            <div class="result-grid">
+                <!-- Left Column -->
+                <div class="result-left">
+                    <!-- Main Result Banner -->
+                    <div class="result-banner glass-panel" id="result-banner">
+                        <div class="result-icon-circle" id="result-icon-bg">
+                            <i class="fa-solid fa-check" id="result-icon"></i>
+                        </div>
+                        <h2 class="result-label" id="diagnosis-label">UNINFECTED</h2>
+                        <p class="result-subtext" id="diagnosis-subtext">No malaria parasites detected</p>
+                    </div>
+
+                    <!-- Confidence Bar -->
+                    <div class="confidence-card glass-panel">
+                        <div class="conf-header">
+                            <h3>Confidence Level</h3>
+                            <span class="conf-value" id="confidence-value-text">99.97%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="confidence-bar-fill"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>Low</span>
+                            <span>Medium</span>
+                            <span>High</span>
+                            <span>Very High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="result-right">
+                    <!-- Analysis Details -->
+                    <div class="details-card glass-panel">
+                        <h3>Analysis Details</h3>
+                        <div class="detail-row">
+                            <span>Model</span>
+                            <span class="detail-value">CustomCNN v2.0</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Processing Time</span>
+                            <span class="detail-value" id="processing-time">4.07s</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Image Quality</span>
+                            <span class="detail-value text-white">Excellent</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Timestamp</span>
+                            <span class="detail-value" id="detail-timestamp">--</span>
+                        </div>
+                    </div>
+
+                    <!-- Medical Disclaimer -->
+                    <div class="disclaimer-card glass-panel">
+                        <h3><i class="fa-solid fa-staff-snake text-blue"></i> Medical Disclaimer</h3>
+                        <p>This AI system is a screening tool for healthcare professionals. Results must be verified by
+                            qualified medical personnel. Not a substitute for professional medical diagnosis.</p>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" id="new-scan-btn">New Scan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Starry Background Elements -->
+    <div class="star-layer">
+        <div class="star star-1"></div>
+        <div class="star star-2"></div>
+        <div class="star star-3"></div>
+        <div class="star star-4"></div>
+        <div class="star star-5"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
